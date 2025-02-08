@@ -2,16 +2,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-import os
-
-from dotenv import load_dotenv
+from env import api_key
 
 from langchain import hub
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_chroma import Chroma
-
-load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 
@@ -39,9 +34,10 @@ def ask_question(request: QueryRequest):
         "cdu": "https://www.politikwechsel.cdu.de/sites/www.politikwechsel.cdu.de/files/docs/politikwechsel-fuer-deutschland-wahlprogramm-von-cdu-csu-1.pdf",
         "grune": "https://cms.gruene.de/uploads/assets/20241216_BTW25_Programmentwurf_DINA4_digital.pdf",
         "fdp": "https://www.fdp.de/sites/default/files/2024-12/fdp-wahlprogramm_2025.pdf",
-        "nazis": "Leitantrag-Bundestagswahlprogramm-2025.pdf",
+        # They are blocking scraping on their sites lol
+        "afd": "Leitantrag-Bundestagswahlprogramm-2025.pdf",
         "linke": "https://www.die-linke.de/fileadmin/user_upload/Wahlprogramm_Langfassung_Linke-BTW25_01.pdf",
-        "kremel":"https://bsw-vg.de/wp-content/themes/bsw/assets/downloads/BSW%20Wahlprogramm%202025.pdf"
+        "bsw":"https://bsw-vg.de/wp-content/themes/bsw/assets/downloads/BSW%20Wahlprogramm%202025.pdf"
     }
     question = request.question.strip()
     party = request.source.strip()
@@ -49,9 +45,7 @@ def ask_question(request: QueryRequest):
     if not question:
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
 
-    retrieved_docs = vector_store.similarity_search(question, filter={"source": party_to_source[party]})
-    
-
+    retrieved_docs = vector_store.similarity_search(question, filter={"source": party_to_source[party]}, k = 10)
     
     context = [f'{doc.page_content} - S.{doc.metadata.get("page", "Unknown")} {doc.metadata.get("source", "Unknown")}' for doc in retrieved_docs]
 

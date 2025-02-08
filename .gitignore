@@ -4,3 +4,4 @@ backend/.env
 backend/env.py
 backend/Leitantrag-Bundestagswahlprogramm-2025.pdf
 frontend/node_modules
+frontend/.env.local

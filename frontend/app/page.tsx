@@ -1,5 +1,4 @@
 "use client";
-import { listenerCount } from "process";
 import { useState } from "react";
 
 export default function Home() {
@@ -17,7 +16,7 @@ export default function Home() {
     setContext([]);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/ask", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, source}),
@@ -38,7 +37,7 @@ export default function Home() {
     <div className="chat-page">
     <div className="slogan">
         <h1>Frag doch mal flott den Bundesbot</h1>
-        <h4>Brought to you by Philipp Kastrup, because sein wir mal ehrlich, wer ließt Wahlprogramme?</h4>
+        <h4>Denn seien wir mal ehrlich, wer nimmt sich die Zeit, ein Wahlprogramm zu lesen?</h4>
     </div>
       <div className="chat-box-container">
         <select
@@ -50,9 +49,9 @@ export default function Home() {
             <option value="cdu">CDU</option>
             <option value="grune">Grüne</option>
             <option value="fdp">FDP</option>
-            <option value="nazis">AfD</option>
+            <option value="afd">AfD</option>
             <option value="linke">Linke</option>
-            <option value="kremel">BSW</option>
+            <option value="bsw">BSW</option>
         </select>
 
         <div className="chat-input">
@@ -84,14 +83,14 @@ export default function Home() {
         </div>
 
         {answer && (
-          <div className="">
+          <div className="response">
             <h2 className="">Answer:</h2>
             <p className="">{answer}</p>
           </div>
         )}
 
         {context && context.length > 0 && (
-          <div className="">
+          <div className="response">
             <h2 className="">Context:</h2>
             {context.map((line, index) => <p key={index} className="reference">{line}</p>)}
           </div>
